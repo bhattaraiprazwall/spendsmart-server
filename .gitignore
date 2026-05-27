@@ -1,0 +1,8 @@
+/node_modules
+/dist
+.env
+spendsmart-bc0f2-firebase-adminsdk-fbsvc-d905859c06.json
+.DS_Store
+*.log
+npm-debug.log*
+yarn-error.log*
