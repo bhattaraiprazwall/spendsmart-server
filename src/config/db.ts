@@ -1,12 +1,10 @@
-import mongoose, { mongo } from "mongoose";
-const connectDB = async (): Promise<void> => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI as string);
-    console.log("MongoDB Connected..");
-  } catch (error) {
-    console.log(error);
-    process.exit(1);
-  }
-};
+import { prisma } from "../lib/prisma";
 
-export default connectDB;
+export async function dbConnection() {
+  try {
+    await prisma.$connect();
+    console.log("DB Connected..");
+  } catch (error) {
+    console.log("DB Error..");
+  }
+}

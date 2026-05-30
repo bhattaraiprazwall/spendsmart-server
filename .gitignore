@@ -7,3 +7,5 @@ spendsmart-bc0f2-firebase-adminsdk-fbsvc-d905859c06.json
 npm-debug.log*
 yarn-error.log*
 /src/generated/prisma
+
+/app/generated/prisma

@@ -5,9 +5,30 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+
+  firebaseUID String   @unique
+
+  email       String   @unique
+
+  name        String?
+
+  role        Role     @default(USER)
+
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  USER
 }
