@@ -1,7 +1,10 @@
 /node_modules
 /dist
 .env
+
+# Firebase credentials - NEVER commit to version control (contains sensitive private keys)
 spendsmart-bc0f2-firebase-adminsdk-fbsvc-d905859c06.json
+
 .DS_Store
 *.log
 npm-debug.log*
