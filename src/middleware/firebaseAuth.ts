@@ -1,33 +1,24 @@
-import { Request, Response, NextFunction }
-from "express";
+import { Request, Response, NextFunction } from "express";
 
 import admin from "../config/firebase";
-
-
 
 export const firebaseAuth = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
-    const authHeader =
-      req.headers.authorization;
+    const authHeader = req.headers.authorization;
 
-    if (
-      !authHeader ||
-      !authHeader.startsWith("Bearer ")
-    ) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         message: "No token provided",
       });
     }
 
-    const token =
-      authHeader.split(" ")[1];
+    const token = authHeader.split(" ")[1];
 
-    const decoded =
-      await admin.auth().verifyIdToken(token);
+    const decoded = await admin.auth().verifyIdToken(token);
 
     req.user = decoded;
 
