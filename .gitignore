@@ -12,3 +12,33 @@ yarn-error.log*
 /src/generated/prisma
 
 /app/generated/prisma
+
+# Environment variables
+.env.local
+.env.*.local
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test and coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Prisma
+.prisma/
+
+# Temporary files
+/src/temp/
+temp/
+getToken.ts
+
+# OS-specific files
+Thumbs.db
+
+# Build artifacts
+build/

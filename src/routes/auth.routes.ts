@@ -1,11 +1,13 @@
-import express from "express";
+import { IRouter, Router } from "express";
+import { validate } from "../middleware/validate.middleware.js";
+import {registerUserSchema } from "../validators/auth.validator.js";
+import { register } from "../controllers/auth.controller.js";
 
-import { syncUser } from "../controllers/auth.controller";
 
-import { firebaseAuth } from "../middleware/firebaseAuth";
+const router:IRouter = Router();
 
-const router = express.Router();
-
-router.post("/sync-user", firebaseAuth, syncUser);
+//Public routes 
+router.post("/register", validate(registerUserSchema), register);
 
 export default router;
+

@@ -1,27 +1,16 @@
-import admin from "firebase-admin";
-import path from "path";
-import fs from "fs";
+import { initializeApp, cert } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+import serviceAccount from "../../spendsmart-bc0f2-firebase-adminsdk-fbsvc-d905859c06.json" with { type: "json" };
 
-// Read Firebase credentials from file path specified in environment variable
-const firebaseCredentialsPath = process.env.FIREBASE_CREDENTIALS_PATH 
-  ? path.resolve(process.env.FIREBASE_CREDENTIALS_PATH)
-  : path.join(__dirname, "../../spendsmart-bc0f2-firebase-adminsdk-fbsvc-d905859c06.json");
-
-if (!fs.existsSync(firebaseCredentialsPath)) {
-  throw new Error(
-    `Firebase credentials file not found at: ${firebaseCredentialsPath}\n` +
-    "Please ensure the file exists or set FIREBASE_CREDENTIALS_PATH environment variable."
-  );
-}
-
-const serviceAccount = JSON.parse(
-  fs.readFileSync(firebaseCredentialsPath, "utf-8")
-);
-
-admin.initializeApp({
-  credential: admin.credential.cert(
-    serviceAccount as admin.ServiceAccount
-  ),
+const app = initializeApp({
+  //   credential: cert(serviceAccount as { projectId: string; privateKey: string; clientEmail: string }),
+  credential: cert({
+    projectId: serviceAccount.project_id,
+    privateKey: serviceAccount.private_key,
+    clientEmail: serviceAccount.client_email,
+  }),
 });
 
-export default admin;
+const auth = getAuth(app);
+
+export { auth, app };

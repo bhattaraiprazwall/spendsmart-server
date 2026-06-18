@@ -1,37 +1,13 @@
-import { Request, Response } from "express";
-import { prisma } from "../lib/prisma";
+import { RequestHandler } from "express";
+import { registerUser } from "../services/auth.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-// import prisma from "../../prisma.config";
+export const register: RequestHandler = asyncHandler(async (req, res) => {
+  const user = await registerUser(
+    req.body.name,
+    req.body.email,
+    req.body.password,
+  );
 
-export const syncUser = async (req: Request, res: Response) => {
-  try {
-    const { uid, email, name } = req.user;
-
-    let user = await prisma.user.findUnique({
-      where: {
-        firebaseUID: uid,
-      },
-    });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          firebaseUID: uid,
-          email,
-          name,
-          role: "USER",
-        },
-      });
-    }
-
-    return res.json({
-      message: "User synced",
-      user,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: "Server Error",
-      error,
-    });
-  }
-};
+  res.status(201).json(user);
+});
