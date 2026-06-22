@@ -4,12 +4,12 @@ import { prisma } from "../lib/prisma.js";
 import "dotenv/config";
 
 export const registerUser = async (
-  fullname: string,
+  name: string,
   email: string,
   password: string,
 ) => {
   const firebaseUser = await auth.createUser({
-    displayName: fullname,
+    displayName: name,
     email,
     password,
   });
@@ -17,7 +17,7 @@ export const registerUser = async (
   const dbUser = await prisma.user.create({
     data: {
       firebaseUid: firebaseUser.uid,
-      name: fullname,
+      name: name,
       email,
     },
   });
