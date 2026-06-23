@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { registerUser } from "../services/auth.service.js";
+import { loginUser, registerUser } from "../services/auth.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const register: RequestHandler = asyncHandler(async (req, res) => {
@@ -10,4 +10,9 @@ export const register: RequestHandler = asyncHandler(async (req, res) => {
   );
 
   res.status(201).json(user);
+});
+
+export const login: RequestHandler = asyncHandler(async (req, res) => {
+  const user = await loginUser(req.body.email, req.body.password);
+  res.status(200).json(user);
 });
