@@ -26,7 +26,7 @@ export const registerUser = async (
 
 export const loginUser = async (email: string, password: string) => {
   const response = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
+    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_WEB_API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

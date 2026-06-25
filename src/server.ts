@@ -21,6 +21,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 
+
 app.listen(PORT, () => {
   dbConnection();
   console.log(`Server is running on PORT ${PORT}`);
