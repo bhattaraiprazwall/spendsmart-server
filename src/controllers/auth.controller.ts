@@ -13,6 +13,10 @@ export const register: RequestHandler = asyncHandler(async (req, res) => {
 });
 
 export const login: RequestHandler = asyncHandler(async (req, res) => {
-  const user = await loginUser(req.body.email, req.body.password);
-  res.status(200).json(user);
+  const tokens = await loginUser(req.body.email, req.body.password);
+  res.status(200).json({
+    success: true,
+    messasge: "Login successful",
+    data: tokens,
+  });
 });
