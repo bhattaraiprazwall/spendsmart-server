@@ -8,12 +8,13 @@ export const getMe: RequestHandler = asyncHandler(async (req, res) => {
 });
 
 export const updateMe: RequestHandler = asyncHandler(async (req, res) => {
-  const { name, avatarUrl, currency, theme } = req.body;
+  const { name, avatarUrl, currency, theme, language } = req.body;
   const user = await userService.updateProfile(req.user!.id, {
     name,
     avatarUrl,
     currency,
     theme,
+    language,
   });
   res.json({ success: true, data: user, message: "Profile updated" });
 });
