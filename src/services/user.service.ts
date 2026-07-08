@@ -6,14 +6,20 @@ export const getProfile = async (userId: string) => {
 
 export const updateProfile = async (
   userId: string,
-  data: { name?: string; avatarUrl?: string; currency?: string; theme?: string; language?: string }
+  data: { name?: string; avatarUrl?: string; password?: string },
 ) => {
   return prisma.user.update({ where: { id: userId }, data });
 };
 
 export const updateSettings = async (
   userId: string,
-  data: { notificationsEnabled?: boolean; budgetAlertThreshold?: number }
+  data: {
+    currency?: string;
+    theme?: string;
+    language?: string;
+    notificationsEnabled?: boolean;
+    budgetAlertThreshold?: number;
+  },
 ) => {
   return prisma.user.update({ where: { id: userId }, data });
 };
