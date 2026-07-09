@@ -69,3 +69,34 @@ export const loginUser = async (email: string, password: string) => {
     expiresIn: data.expiresIn,
   };
 };
+
+//for change password service
+export const changePassword = async (
+  email: string,
+  firebaseUid: string,
+  currentPassword: string,
+  newPassword: string,
+) => {
+  //verifying the current password via firebase reset api
+  const verifyRes = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_WEB_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        password: currentPassword,
+        returnSecureToken: true,
+      }),
+    },
+  );
+  const verifyData = await verifyRes.json();
+  if (!verifyRes.ok) {
+    const code = verifyData.error?.message ?? "INVALID LOGIN CREDENTIALS";
+    throw new Error(
+      FIREBASE_ERROR_MAP[code] ?? "Current password is incorrect",
+    );
+  }
+  //update password via firebase admin sdk
+  await auth.updateUser(firebaseUid, { password: newPassword });
+};
