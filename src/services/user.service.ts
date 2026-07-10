@@ -6,7 +6,7 @@ export const getProfile = async (userId: string) => {
 
 export const updateProfile = async (
   userId: string,
-  data: { name?: string; avatarUrl?: string; password?: string },
+  data: { name?: string; avatarUrl?: string },
 ) => {
   return prisma.user.update({ where: { id: userId }, data });
 };
