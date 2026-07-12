@@ -30,9 +30,35 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  categories Category[]
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  icon      String
+  color     String
+  isDefault Boolean  @default(false)
+
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  keywords CategoryKeyword[]
+}
+
+model CategoryKeyword {
+  id         String   @id @default(uuid())
+  keyword    String
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([keyword, categoryId])
 }
