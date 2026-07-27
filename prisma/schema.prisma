@@ -31,12 +31,42 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  categories Category[]
+  categories   Category[]
+  transactions Transaction[]
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum TransactionType {
+  EXPENSE
+  INCOME
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  UPI
+  OTHER
+}
+
+model Transaction {
+  id            String          @id @default(uuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          TransactionType @default(EXPENSE)
+  amount        Decimal         @db.Decimal(12, 2)
+  title         String
+  note          String?
+  paymentMethod PaymentMethod   @default(CARD)
+  date          DateTime
+  categoryId    String
+  category      Category        @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model Category {
@@ -51,7 +81,8 @@ model Category {
 
   createdAt DateTime @default(now())
 
-  keywords CategoryKeyword[]
+  keywords     CategoryKeyword[]
+  transactions Transaction[]
 }
 
 model CategoryKeyword {

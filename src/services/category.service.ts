@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js";
+import { predictCategoryMNB } from "./prediction.service.js";
 
 export const getCategories = async (userId: string) => {
   const categories = await prisma.category.findMany({
@@ -61,8 +62,13 @@ export const deleteCategory = async (categoryId: string, userId: string) => {
 };
 
 export const predictCategory = async (title: string, userId: string) => {
-  const titleLower = title.toLowerCase();
+  const mnbResult = await predictCategoryMNB(title, userId);
 
+  if (mnbResult.predictedCategory && mnbResult.confidence >= 0.3) {
+    return mnbResult;
+  }
+
+  const titleLower = title.toLowerCase();
   const categories = await prisma.category.findMany({
     where: { OR: [{ isDefault: true }, { userId }] },
     include: { keywords: true },
