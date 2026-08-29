@@ -33,6 +33,7 @@ model User {
 
   categories   Category[]
   transactions Transaction[]
+  budgets      Budget[]
 }
 
 enum Role {
@@ -49,7 +50,8 @@ enum PaymentMethod {
   CASH
   CARD
   BANK_TRANSFER
-  UPI
+  ESEWA
+  KHALTI
   OTHER
 }
 
@@ -70,19 +72,21 @@ model Transaction {
 }
 
 model Category {
-  id        String   @id @default(uuid())
+  id        String          @id @default(uuid())
   name      String
   icon      String
   color     String
-  isDefault Boolean  @default(false)
+  isDefault Boolean         @default(false)
+  type      TransactionType @default(EXPENSE)
 
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
-  keywords     CategoryKeyword[]
-  transactions Transaction[]
+  keywords         CategoryKeyword[]
+  transactions     Transaction[]
+  budgetCategories BudgetCategory[]
 }
 
 model CategoryKeyword {
@@ -92,4 +96,37 @@ model CategoryKeyword {
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([keyword, categoryId])
+}
+
+model Budget {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  month       Int      // 1–12
+  year        Int
+  totalAmount Decimal  @db.Decimal(12, 2)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  budgetCategories BudgetCategory[]
+
+  @@unique([userId, month, year])
+}
+
+model BudgetCategory {
+  id         String   @id @default(uuid())
+  budgetId   String
+  budget     Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  limit      Decimal  @db.Decimal(12, 2)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([budgetId, categoryId])
 }

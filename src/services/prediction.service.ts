@@ -142,14 +142,18 @@ class MnbPredictor {
 export const predictCategoryMNB = async (
   title: string,
   userId: string,
+  type?: "EXPENSE" | "INCOME",
 ): Promise<PredictionResult> => {
   const [transactions, categories] = await Promise.all([
     prisma.transaction.findMany({
-      where: { userId },
+      where: { userId, ...(type ? { type } : {}) },
       select: { title: true, categoryId: true },
     }),
     prisma.category.findMany({
-      where: { OR: [{ isDefault: true }, { userId }] },
+      where: {
+        OR: [{ isDefault: true }, { userId }],
+        ...(type ? { type } : {}),
+      },
       select: { id: true, name: true, icon: true, color: true },
     }),
   ]);

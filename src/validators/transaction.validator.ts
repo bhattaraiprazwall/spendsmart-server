@@ -6,7 +6,7 @@ export const createTransactionSchema = z.object({
   title: z.string().min(1, "Title is required"),
   note: z.string().optional(),
   paymentMethod: z
-    .enum(["CASH", "CARD", "UPI", "BANK_TRANSFER", "OTHER"])
+    .enum(["CASH", "CARD", "BANK_TRANSFER", "ESEWA", "KHALTI", "OTHER"])
     .default("CARD"),
   date: z.string().refine((d) => !isNaN(Date.parse(d)), "Invalid date"),
   categoryId: z.string().uuid("Invalid category ID"),

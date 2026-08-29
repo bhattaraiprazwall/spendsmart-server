@@ -4,7 +4,8 @@ import * as categoryService from "../services/category.service.js";
 import { CategoryParams } from "../types/category.type.js";
 
 export const getAll: RequestHandler = asyncHandler(async (req, res) => {
-  const categories = await categoryService.getCategories(req.user!.id);
+  const type = req.query.type as "EXPENSE" | "INCOME" | undefined;
+  const categories = await categoryService.getCategories(req.user!.id, type);
   res.json({ success: true, data: { categories } });
 });
 
@@ -55,6 +56,10 @@ export const predict: RequestHandler = asyncHandler(async (req, res) => {
     return;
   }
 
-  const result = await categoryService.predictCategory(title, req.user!.id);
+  const result = await categoryService.predictCategory(
+    title,
+    req.user!.id,
+    req.query.type as "EXPENSE" | "INCOME" | undefined,
+  );
   res.json({ success: true, data: result });
 });

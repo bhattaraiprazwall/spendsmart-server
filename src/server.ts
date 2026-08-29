@@ -6,6 +6,8 @@ import authRoutes from "../src/routes/auth.routes.js";
 import userRoutes from "../src/routes/user.routes.js";
 import categoryRoutes from "../src/routes/category.routes.js";
 import transactionRoutes from "../src/routes/transaction.routes.js";
+import dashboardRoutes from "../src/routes/dashboard.routes.js";
+import budgetRoutes from "../src/routes/budget.routes.js";
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/transactions", transactionRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
+app.use("/api/v1/budgets", budgetRoutes);
 
 app.use(errorHandler);
 

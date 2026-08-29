@@ -1,13 +1,17 @@
 import { prisma } from "../lib/prisma.js";
 import { predictCategoryMNB } from "./prediction.service.js";
 
-export const getCategories = async (userId: string) => {
+export const getCategories = async (
+  userId: string,
+  type?: "EXPENSE" | "INCOME",
+) => {
   const categories = await prisma.category.findMany({
     where: {
       OR: [
         { isDefault: true },
         { userId },
       ],
+      ...(type ? { type } : {}),
     },
     orderBy: [{ isDefault: "desc" }, { name: "asc" }],
   });
@@ -16,10 +20,14 @@ export const getCategories = async (userId: string) => {
 
 export const createCategory = async (
   userId: string,
-  data: { name: string; icon: string; color: string },
+  data: { name: string; icon: string; color: string; type: "EXPENSE" | "INCOME" },
 ) => {
   const existing = await prisma.category.findFirst({
-    where: { name: data.name, OR: [{ isDefault: true }, { userId }] },
+    where: {
+      name: data.name,
+      type: data.type,
+      OR: [{ isDefault: true }, { userId }],
+    },
   });
   if (existing) {
     throw new Error(`Category "${data.name}" already exists`);
@@ -34,13 +42,29 @@ export const createCategory = async (
 export const updateCategory = async (
   categoryId: string,
   userId: string,
-  data: { name?: string; icon?: string; color?: string },
+  data: {
+    name?: string;
+    icon?: string;
+    color?: string;
+    type?: "EXPENSE" | "INCOME";
+  },
 ) => {
   const existing = await prisma.category.findFirst({
     where: { id: categoryId, userId },
   });
   if (!existing) {
     throw new Error("Category not found or not editable");
+  }
+
+  if (data.type && data.type !== existing.type) {
+    const transactionCount = await prisma.transaction.count({
+      where: { categoryId },
+    });
+    if (transactionCount > 0) {
+      throw new Error(
+        "Cannot change type of a category that already has transactions",
+      );
+    }
   }
 
   const category = await prisma.category.update({
@@ -61,8 +85,12 @@ export const deleteCategory = async (categoryId: string, userId: string) => {
   await prisma.category.delete({ where: { id: categoryId } });
 };
 
-export const predictCategory = async (title: string, userId: string) => {
-  const mnbResult = await predictCategoryMNB(title, userId);
+export const predictCategory = async (
+  title: string,
+  userId: string,
+  type?: "EXPENSE" | "INCOME",
+) => {
+  const mnbResult = await predictCategoryMNB(title, userId, type);
 
   if (mnbResult.predictedCategory && mnbResult.confidence >= 0.3) {
     return mnbResult;
@@ -70,7 +98,10 @@ export const predictCategory = async (title: string, userId: string) => {
 
   const titleLower = title.toLowerCase();
   const categories = await prisma.category.findMany({
-    where: { OR: [{ isDefault: true }, { userId }] },
+    where: {
+      OR: [{ isDefault: true }, { userId }],
+      ...(type ? { type } : {}),
+    },
     include: { keywords: true },
   });
 

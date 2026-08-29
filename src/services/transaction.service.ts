@@ -1,12 +1,13 @@
 import { prisma } from "../lib/prisma.js";
 import { Prisma } from "../generated/prisma/client.js";
+import { checkOverspending } from "./budget.service.js";
 
 interface CreateTransactionData {
   type: "EXPENSE" | "INCOME";
   amount: number;
   title: string;
   note?: string;
-  paymentMethod: "CASH" | "CARD" | "UPI" | "BANK_TRANSFER" | "OTHER";
+  paymentMethod: "CASH" | "CARD" | "BANK_TRANSFER" | "ESEWA" | "KHALTI" | "OTHER";
   date: string;
   categoryId: string;
 }
@@ -27,6 +28,15 @@ export const createTransaction = async (
   userId: string,
   data: CreateTransactionData,
 ) => {
+  const category = await prisma.category.findUnique({
+    where: { id: data.categoryId },
+    select: { id: true, type: true },
+  });
+  if (!category) throw new Error("Category not found");
+  if (category.type !== data.type) {
+    throw new Error("Category type does not match transaction type");
+  }
+
   const transaction = await prisma.transaction.create({
     data: {
       userId,
@@ -40,11 +50,23 @@ export const createTransaction = async (
     },
     include: {
       category: {
-        select: { id: true, name: true, icon: true, color: true },
+        select: { id: true, name: true, icon: true, color: true, type: true },
       },
     },
   });
-  return transaction;
+
+  if (transaction.type === "EXPENSE") {
+    const date = new Date(transaction.date);
+    const alert = await checkOverspending(
+      userId,
+      data.categoryId,
+      date.getMonth() + 1,
+      date.getFullYear(),
+    );
+    return { transaction, alert };
+  }
+
+  return { transaction, alert: null };
 };
 
 export const getTransactions = async (
@@ -81,7 +103,7 @@ export const getTransactions = async (
       where,
       include: {
         category: {
-          select: { id: true, name: true, icon: true, color: true },
+          select: { id: true, name: true, icon: true, color: true, type: true },
         },
       },
       orderBy: { [sortBy]: order },
@@ -105,7 +127,7 @@ export const getTransaction = async (id: string, userId: string) => {
     where: { id, userId },
     include: {
       category: {
-        select: { id: true, name: true, icon: true, color: true },
+        select: { id: true, name: true, icon: true, color: true, type: true },
       },
     },
   });
@@ -123,20 +145,46 @@ export const updateTransaction = async (
   });
   if (!existing) throw new Error("Transaction not found");
 
+  const nextType = data.type ?? existing.type;
+  const nextCategoryId = data.categoryId ?? existing.categoryId;
+  const nextDate = data.date ? new Date(data.date) : existing.date;
+
+  if (nextType !== existing.type || nextCategoryId !== existing.categoryId) {
+    const category = await prisma.category.findUnique({
+      where: { id: nextCategoryId },
+      select: { id: true, type: true },
+    });
+    if (!category) throw new Error("Category not found");
+    if (category.type !== nextType) {
+      throw new Error("Category type does not match transaction type");
+    }
+  }
+
   const updateData: any = { ...data };
   if (data.amount) updateData.amount = new Prisma.Decimal(data.amount);
-  if (data.date) updateData.date = new Date(data.date);
+  if (data.date) updateData.date = nextDate;
 
   const transaction = await prisma.transaction.update({
     where: { id },
     data: updateData,
     include: {
       category: {
-        select: { id: true, name: true, icon: true, color: true },
+        select: { id: true, name: true, icon: true, color: true, type: true },
       },
     },
   });
-  return transaction;
+
+  if (transaction.type === "EXPENSE") {
+    const alert = await checkOverspending(
+      userId,
+      transaction.categoryId,
+      nextDate.getMonth() + 1,
+      nextDate.getFullYear(),
+    );
+    return { transaction, alert };
+  }
+
+  return { transaction, alert: null };
 };
 
 export const deleteTransaction = async (id: string, userId: string) => {

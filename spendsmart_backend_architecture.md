@@ -435,6 +435,7 @@ All endpoints are prefixed with `/api/v1`. Every route is protected by Firebase 
 This is the most important endpoint for your Flutter home screen. It aggregates:
 - Total balance, income, expenses for the month
 - Budget remaining
+
 - Top categories with spending
 - Recent transactions (last 5)
 - Smart alert (overspending detection result)

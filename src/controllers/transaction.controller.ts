@@ -3,13 +3,13 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import * as transactionService from "../services/transaction.service.js";
 
 export const create: RequestHandler = asyncHandler(async (req, res) => {
-  const transaction = await transactionService.createTransaction(
+  const { transaction, alert } = await transactionService.createTransaction(
     req.user!.id,
     req.body,
   );
   res.status(201).json({
     success: true,
-    data: { transaction },
+    data: { transaction, ...(alert ? { alert } : {}) },
     message: "Transaction created successfully",
   });
 });
@@ -38,10 +38,14 @@ export const update: RequestHandler = asyncHandler(async (req, res) => {
     res.status(400).json({ success: false, message: "Transaction id is required" });
     return;
   }
-  const transaction = await transactionService.updateTransaction(id, req.user!.id, req.body);
+  const { transaction, alert } = await transactionService.updateTransaction(
+    id,
+    req.user!.id,
+    req.body,
+  );
   res.json({
     success: true,
-    data: { transaction },
+    data: { transaction, ...(alert ? { alert } : {}) },
     message: "Transaction updated successfully",
   });
 });
