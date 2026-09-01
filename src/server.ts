@@ -8,6 +8,9 @@ import categoryRoutes from "../src/routes/category.routes.js";
 import transactionRoutes from "../src/routes/transaction.routes.js";
 import dashboardRoutes from "../src/routes/dashboard.routes.js";
 import budgetRoutes from "../src/routes/budget.routes.js";
+import insightRoutes from "../src/routes/insights.routes.js";
+
+// import predictCategory from '../src/algorithms/categoryPrediction.js';
 
 const app = express();
 
@@ -28,6 +31,7 @@ app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/transactions", transactionRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/budgets", budgetRoutes);
+app.use("/api/v1/insights", insightRoutes);
 
 app.use(errorHandler);
 
@@ -35,3 +39,5 @@ app.listen(PORT, () => {
   dbConnection();
   console.log(`Server is running on PORT ${PORT}`);
 });
+
+
