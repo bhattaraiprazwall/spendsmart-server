@@ -7,6 +7,7 @@ export const createCategorySchema = z.object({
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, "Color must be a hex value like #FF6B6B"),
   type: z.enum(["EXPENSE", "INCOME"]).default("EXPENSE"),
+  canonicalKey: z.string().trim().optional(),
 });
 
 export const updateCategorySchema = z.object({
@@ -14,4 +15,5 @@ export const updateCategorySchema = z.object({
   icon: z.string().trim().min(1).optional(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
   type: z.enum(["EXPENSE", "INCOME"]).optional(),
+  canonicalKey: z.string().trim().nullable().optional(),
 });

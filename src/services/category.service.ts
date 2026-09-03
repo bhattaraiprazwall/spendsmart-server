@@ -1,5 +1,9 @@
 import { prisma } from "../lib/prisma.js";
-import { predictCategoryMNB } from "./prediction.service.js";
+import {
+  predictCategory as predictViaML,
+  type PredictionResponse,
+} from "./category-prediction.service.js";
+import { resolveCategoryByLabel } from "./category-mapper.js";
 
 export const getCategories = async (
   userId: string,
@@ -20,7 +24,13 @@ export const getCategories = async (
 
 export const createCategory = async (
   userId: string,
-  data: { name: string; icon: string; color: string; type: "EXPENSE" | "INCOME" },
+  data: {
+    name: string;
+    icon: string;
+    color: string;
+    type: "EXPENSE" | "INCOME";
+    canonicalKey?: string;
+  },
 ) => {
   const existing = await prisma.category.findFirst({
     where: {
@@ -47,6 +57,7 @@ export const updateCategory = async (
     icon?: string;
     color?: string;
     type?: "EXPENSE" | "INCOME";
+    canonicalKey?: string | null;
   },
 ) => {
   const existing = await prisma.category.findFirst({
@@ -90,13 +101,6 @@ export const predictCategory = async (
   userId: string,
   type?: "EXPENSE" | "INCOME",
 ) => {
-  const mnbResult = await predictCategoryMNB(title, userId, type);
-
-  if (mnbResult.predictedCategory && mnbResult.confidence >= 0.3) {
-    return mnbResult;
-  }
-
-  const titleLower = title.toLowerCase();
   const categories = await prisma.category.findMany({
     where: {
       OR: [{ isDefault: true }, { userId }],
@@ -105,20 +109,42 @@ export const predictCategory = async (
     include: { keywords: true },
   });
 
+  let mlResult: PredictionResponse | null = null;
+  try {
+    mlResult = await predictViaML(title);
+  } catch {
+    mlResult = null;
+  }
+
+  const titleLower = title.toLowerCase();
   let bestMatch = null;
   let bestScore = 0;
 
-  for (const cat of categories) {
-    let score = 0;
-    for (const kw of cat.keywords) {
-      if (titleLower.includes(kw.keyword.toLowerCase())) {
-        score += 1;
+  const mlMatchedCategory = mlResult?.category
+    ? await resolveCategoryByLabel(userId, mlResult.category)
+    : null;
+
+  if (
+    mlResult &&
+    mlMatchedCategory &&
+    mlResult.confidence >= 0.3
+  ) {
+    bestMatch = mlMatchedCategory;
+    bestScore = mlResult.confidence;
+  } else {
+    for (const cat of categories) {
+      let score = 0;
+      for (const kw of cat.keywords) {
+        if (titleLower.includes(kw.keyword.toLowerCase())) {
+          score += 1;
+        }
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = cat;
       }
     }
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = cat;
-    }
+    bestScore = bestScore > 0 ? Math.min(bestScore * 0.3, 1.0) : 0;
   }
 
   return {
@@ -130,6 +156,9 @@ export const predictCategory = async (
           color: bestMatch.color,
         }
       : null,
-    confidence: bestScore > 0 ? Math.min(bestScore * 0.3, 1.0) : 0,
+    confidence: bestScore,
+    ...(mlResult?.probabilities
+      ? { probabilities: mlResult.probabilities }
+      : {}),
   };
 };

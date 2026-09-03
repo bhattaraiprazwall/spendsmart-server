@@ -15,6 +15,7 @@ export const authMiddleware = async (
     }
 
     const token = header.split("Bearer ")[1];
+    console.log("Token:", token);
     if (!token) {
       res.status(401).json({ success: false, message: "Unauthorized" });
       return;

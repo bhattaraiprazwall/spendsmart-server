@@ -72,12 +72,13 @@ model Transaction {
 }
 
 model Category {
-  id        String          @id @default(uuid())
-  name      String
-  icon      String
-  color     String
-  isDefault Boolean         @default(false)
-  type      TransactionType @default(EXPENSE)
+  id           String          @id @default(uuid())
+  name         String
+  icon         String
+  color        String
+  canonicalKey String?
+  isDefault    Boolean         @default(false)
+  type         TransactionType @default(EXPENSE)
 
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
