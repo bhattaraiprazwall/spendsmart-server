@@ -1,11 +1,9 @@
-import { IUser } from "../../models/user.model";
+import { User } from "../generated/prisma/client.js";
 
 declare global {
   namespace Express {
     export interface Request {
-      user?: any;
-
-      dbUser?: IUser;
+      user?: User;
     }
   }
 }

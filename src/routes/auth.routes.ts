@@ -1,7 +1,7 @@
 import { IRouter, Router } from "express";
 import { validate } from "../middleware/validate.middleware.js";
 import {loginUserSchema, registerUserSchema } from "../validators/auth.validator.js";
-import { register,login, changePass } from "../controllers/auth.controller.js";
+import { register,login, changePass, refresh } from "../controllers/auth.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 
 
@@ -11,6 +11,7 @@ const router:IRouter = Router();
 router.post("/register", validate(registerUserSchema), register);
 router.post("/login",validate(loginUserSchema),login);
 router.post("/change-password",authMiddleware,changePass);
+router.post("/refresh", refresh);
 
 export default router;
 

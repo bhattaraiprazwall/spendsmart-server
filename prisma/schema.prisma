@@ -34,6 +34,7 @@ model User {
   categories   Category[]
   transactions Transaction[]
   budgets      Budget[]
+  anomalyNotifications AnomalyNotification[]
 }
 
 enum Role {
@@ -130,4 +131,18 @@ model BudgetCategory {
   updatedAt  DateTime @updatedAt
 
   @@unique([budgetId, categoryId])
+}
+
+
+model AnomalyNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  year      Int
+  month     Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, year, month])
+  @@index([userId])
 }

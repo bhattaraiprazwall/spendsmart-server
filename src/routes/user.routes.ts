@@ -10,5 +10,6 @@
     router.put("/me", userController.updateMe);
     router.put("/me/settings", userController.updateSettings);
     router.delete("/me", userController.deleteMe);
+    router.put("/me/fcm-token", userController.updateFcmToken);
 
     export default router;

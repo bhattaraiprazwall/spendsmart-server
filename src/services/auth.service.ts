@@ -100,3 +100,29 @@ export const changePassword = async (
   //update password via firebase admin sdk
   await auth.updateUser(firebaseUid, { password: newPassword });
 };
+
+export const refreshUserToken = async (refreshToken: string) => {
+  const response = await fetch(
+    `https://securetoken.googleapis.com/v1/token?key=${process.env.FIREBASE_WEB_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+      }),
+    }
+  );
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error("Failed to refresh token");
+  }
+
+  return {
+    idToken: data.id_token,
+    refreshToken: data.refresh_token,
+    expiresIn: data.expires_in,
+  };
+};
+

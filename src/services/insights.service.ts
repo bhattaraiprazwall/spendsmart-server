@@ -44,8 +44,9 @@ export const getCategoryBreakdown = async (
     const amount = Number(tx.amount);
     totalSpent += amount;
 
-    if (breakdownMap[tx.categoryId]) {
-      breakdownMap[tx.categoryId].amount += amount;
+    const existing = breakdownMap[tx.categoryId];
+    if (existing) {
+      existing.amount += amount;
     } else {
       breakdownMap[tx.categoryId] = {
         name: tx.category.name,

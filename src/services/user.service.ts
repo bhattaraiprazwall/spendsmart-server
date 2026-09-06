@@ -27,3 +27,14 @@ export const updateSettings = async (
 export const deleteAccount = async (userId: string) => {
   return prisma.user.delete({ where: { id: userId } });
 };
+
+
+export const updateFcmToken = async (
+  userId: string,
+  fcmToken: string,
+) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { fcmToken },
+  });
+};

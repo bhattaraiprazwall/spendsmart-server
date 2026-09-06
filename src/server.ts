@@ -56,6 +56,9 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 import budgetRoutes from "./routes/budget.routes.js";
 import insightRoutes from "./routes/insights.routes.js";
 import categoryPredictionRoutes from "./routes/category-prediction.routes.js";
+import analyticsRoutes from "./routes/zScoreAnalytics.route.js";
+import notificationRoutes from "./routes/notification.routes.js";
+import { startAnomalyNotificationJob } from "./jobs/anomalyNotification.job.js";
 
 const app = express();
 
@@ -78,12 +81,14 @@ app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/budgets", budgetRoutes);
 app.use("/api/v1/insights", insightRoutes);
 app.use("/api/v1/analytics", categoryPredictionRoutes);
+app.use("/api/v1/analytics", analyticsRoutes);
+app.use("/api/v1/notifications",notificationRoutes);
 
 app.use(errorHandler);
 
+startAnomalyNotificationJob();
 app.listen(PORT, () => {
   dbConnection();
 
   console.log(`Server is running on PORT ${PORT}`);
 });
-

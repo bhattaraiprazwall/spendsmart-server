@@ -38,3 +38,27 @@ export const deleteMe: RequestHandler = asyncHandler(async (req, res) => {
   await userService.deleteAccount(req.user!.id);
   res.json({ success: true, message: "Account deleted" });
 });
+
+
+export const updateFcmToken: RequestHandler = asyncHandler(
+  async (req, res) => {
+    const { fcmToken } = req.body;
+
+    if (!fcmToken || typeof fcmToken !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "FCM token is required",
+      });
+    }
+
+    await userService.updateFcmToken(
+      req.user!.id,
+      fcmToken,
+    );
+
+    res.json({
+      success: true,
+      message: "FCM token updated",
+    });
+  },
+);

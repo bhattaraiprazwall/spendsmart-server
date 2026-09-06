@@ -6,6 +6,7 @@ import {
 } from "../services/auth.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { success } from "zod";
+import {refreshUserToken} from "../services/auth.service.js";
 
 export const register: RequestHandler = asyncHandler(async (req, res) => {
   const user = await registerUser(
@@ -35,4 +36,16 @@ export const changePass: RequestHandler = asyncHandler(async (req, res) => {
     newPassword,
   );
   res.json({ success: true, message: "Password changed successfully" });
+});
+
+
+
+export const refresh: RequestHandler = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    res.status(400).json({ success: false, message: "Refresh token is required" });
+    return;
+  }
+  const tokens = await refreshUserToken(refreshToken);
+  res.status(200).json({ success: true, data: tokens });
 });
