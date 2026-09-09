@@ -59,6 +59,7 @@ import categoryPredictionRoutes from "./routes/category-prediction.routes.js";
 import analyticsRoutes from "./routes/zScoreAnalytics.route.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import { startAnomalyNotificationJob } from "./jobs/anomalyNotification.job.js";
+import forecastRoutes from "./routes/forecast.routes.js";
 
 const app = express();
 
@@ -83,6 +84,7 @@ app.use("/api/v1/insights", insightRoutes);
 app.use("/api/v1/analytics", categoryPredictionRoutes);
 app.use("/api/v1/analytics", analyticsRoutes);
 app.use("/api/v1/notifications",notificationRoutes);
+app.use("/api/v1/forecast",forecastRoutes);
 
 app.use(errorHandler);
 

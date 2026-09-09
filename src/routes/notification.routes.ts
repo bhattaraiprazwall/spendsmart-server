@@ -1,9 +1,6 @@
 import { IRouter, Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
-import {
-  sendTestNotification,
-  runAnomalyJob,
-} from "../controllers/notification.controller.js";
+import { sendTestNotification } from "../controllers/notification.controller.js";
 const router: IRouter = Router();
 
 router.post(
@@ -11,10 +8,4 @@ router.post(
   authMiddleware,
   sendTestNotification,
 );
-router.post(
-  "/test-anomaly-job",
-  authMiddleware,
-  runAnomalyJob,
-);
-
-export default router;
+export default router;  
